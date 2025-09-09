@@ -292,24 +292,51 @@
 
     // safely call ad SDK function name (returns Promise)
     function showAdPromise() {
-      return new Promise((resolve, reject) => {
-        try {
-          const fn = window[SDK_CALL_NAME];
-          if (typeof fn === 'function') {
-            // many SDKs return a promise
-            const res = fn();
-            if (res && typeof res.then === 'function') {
-              res.then(resolve).catch(reject);
-            } else {
-              // not a promise — treat as success
-              resolve(res);
-            }
-          } else {
-            reject(new Error('Ad SDK not available'));
-          }
-        } catch(err) { reject(err); }
-      });
+  return new Promise((resolve, reject) => {
+    try {
+      const fn = window["show_9809389"]; // make sure function exists
+      if (typeof fn === "function") {
+        const res = fn();
+        if (res && typeof res.then === "function") {
+          res.then(resolve).catch(reject);
+        } else {
+          resolve(res);
+        }
+      } else {
+        reject(new Error("Ad SDK not loaded"));
+      }
+    } catch (err) {
+      reject(err);
     }
+  });
+}
+
+watchAdBtn.addEventListener("click", () => {
+  if (state.ads >= DAILY_AD_LIMIT) {
+    tg?.showAlert("Daily ad watch limit reached") || alert("Daily ad watch limit reached");
+    return;
+  }
+
+  loadingModal.style.display = "flex";
+
+  showAdPromise()
+    .then(() => {
+      state.points += POINTS_PER_AD;
+      state.ads += 1;
+      saveState(state);
+      updateUI();
+      tg?.showAlert(`Congratulations! You earned ৳${POINTS_PER_AD}`) || alert(`You earned ৳${POINTS_PER_AD}`);
+    })
+    .catch((err) => {
+      tg?.showAlert("Ad failed to load. Please try again later.") || alert("Ad failed to load. Please try again later.");
+      console.warn("Ad error:", err);
+    })
+    .finally(() => {
+      loadingModal.style.display = "none";
+    });
+});
+
+  
 
     // UI & behavior
     let state = loadState();
