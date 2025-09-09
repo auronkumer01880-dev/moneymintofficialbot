@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
 
-
+  <!-- Ad SDK (keep, your zone id used below) -->
   <script src='//libtl.com/sdk.js' data-zone='9809389' data-sdk='show_9809389' async></script>
 
   <style>
@@ -66,7 +66,7 @@
     <main>
       <!-- HOME -->
       <section id="home-page" class="page active">
-        <h2>Dashboard</h2>
+        <h2>ড্যাশবোর্ড</h2>
         <div class="stats-grid">
           <div class="stat-card"><h3>Daily Ads Watched</h3><p><span id="ads-watched">0</span>/25</p></div>
           <div class="stat-card"><h3>Total Referrals</h3><p id="referrals">0</p></div>
@@ -87,7 +87,7 @@
         <div class="task-container">
           <i class="fas fa-video task-icon"></i>
           <h3>Watch Ads</h3>
-          <p>Earn ৳5 per ad (daily limit 30)</p>
+          <p>Earn ৳5 per ad (daily limit 25)</p>
           <button id="watch-ad-btn" class="action-btn">Watch Ad</button>
         </div>
 
@@ -151,23 +151,21 @@
 
   <!-- Telegram WebApp (optional) -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src='//libtl.com/sdk.js' data-zone='9809389' data-sdk='show_9809389'></script>
-
 
   <script>
   (function() {
     // ========== CONFIG - replace these ==========
     const BOT_TOKEN = "7372978943:AAEYtHZGT6zXDfF1YPOVW3_6EL20MzkMFEU";           // e.g. "123456:ABC-DEF..."
     const ADMIN_CHAT_ID = "1360972796";       // your admin chat id to receive withdraw messages
-    const BOT_USERNAME = " Devil 🍅"; // without @
+    const BOT_USERNAME = "moneymintofficialbot"; // without @
     const CHANNEL_LINK = "https://t.me/moneymintofficialbot1"; // Telegram channel link
-    const YOUTUBE_LINK = "https://www.youtube.com/channel/UCLiyY2BkpA3Xqvpzify4bvA"; // YouTube channel link
+    const YOUTUBE_LINK = "https://www.youtube.com/@AuronOfficial"; // YouTube channel link
     // ============================================
 
-    const SDK_CALL_NAME = "show_9809389"; // as included in <script> data-sdk 
+    const SDK_CALL_NAME = "show_9809389"; // as included in <script> data-sdk
 
     // Business rules
-    const DAILY_AD_LIMIT = 30;
+    const DAILY_AD_LIMIT = 25;
     const POINTS_PER_AD = 5;
     const TELEGRAM_BONUS = 20;
     const YOUTUBE_BONUS = 30;
@@ -336,8 +334,7 @@ watchAdBtn.addEventListener("click", () => {
     });
 });
 
-  
-
+   
     // UI & behavior
     let state = loadState();
     // override referrals number from stored per-user refcount
@@ -363,6 +360,25 @@ watchAdBtn.addEventListener("click", () => {
         try { if (tg) tg.showAlert("Referral link copied!"); else alert("Referral link copied!"); } catch(e){}
       }).catch(()=> {
         try { if (tg) tg.showAlert("Copy failed"); else alert("Copy failed"); } catch(e){}
+      });
+    });
+
+    watchAdBtn.addEventListener('click', ()=>{
+      if (state.ads >= DAILY_AD_LIMIT) { try{ if(tg) tg.showAlert("Daily ad watch limit reached"); else alert("Daily ad watch limit reached"); } catch(e){}; return; }
+      // show loading
+      loadingModal.style.display = "flex";
+      showAdPromise().then(()=>{
+        // ad completed
+        state.points += POINTS_PER_AD;
+        state.ads += 1;
+        saveState(state);
+        updateUI();
+        try { if (tg) tg.showAlert(`Congratulations! You earned ৳${POINTS_PER_AD}`); else alert(`You earned ৳${POINTS_PER_AD}`); } catch(e){}
+      }).catch((err)=>{
+        try { if (tg) tg.showAlert("Ad failed to load. Try again later."); else alert("Ad failed to load."); } catch(e){}
+        console.warn("Ad error:", err);
+      }).finally(()=>{
+        loadingModal.style.display = "none";
       });
     });
 
