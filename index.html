@@ -66,7 +66,7 @@
     <main>
       <!-- HOME -->
       <section id="home-page" class="page active">
-        <h2>ড্যাশবোর্ড</h2>
+        <h2>Dashboard</h2>
         <div class="stats-grid">
           <div class="stat-card"><h3>Daily Ads Watched</h3><p><span id="ads-watched">0</span>/25</p></div>
           <div class="stat-card"><h3>Total Referrals</h3><p id="referrals">0</p></div>
@@ -87,7 +87,7 @@
         <div class="task-container">
           <i class="fas fa-video task-icon"></i>
           <h3>Watch Ads</h3>
-          <p>Earn ৳5 per ad (daily limit 25)</p>
+          <p>Earn ৳5 per ad (daily limit 30)</p>
           <button id="watch-ad-btn" class="action-btn">Watch Ad</button>
         </div>
 
@@ -109,7 +109,7 @@
       <!-- WITHDRAW -->
       <section id="withdraw-page" class="page">
         <h2>Withdraw</h2>
-        <p>Minimum <strong>50 TK</strong> and at least <strong>10 referrals</strong> are required to withdraw.</p>
+        <p>Minimum <strong>5 TK</strong> and at least <strong>0 referrals</strong> are required to withdraw.</p>
 
         <form id="withdraw-form">
           <div class="form-group">
@@ -167,12 +167,12 @@
     const SDK_CALL_NAME = "show_9809389"; // as included in <script> data-sdk 
 
     // Business rules
-    const DAILY_AD_LIMIT = 25;
+    const DAILY_AD_LIMIT = 30;
     const POINTS_PER_AD = 5;
     const TELEGRAM_BONUS = 20;
     const YOUTUBE_BONUS = 30;
-    const MIN_WITHDRAW = 50;
-    const MIN_REFERRALS = 10;
+    const MIN_WITHDRAW = 5;
+    const MIN_REFERRALS = 0;
 
     // UI elements
     const userPhoto = document.getElementById('user-photo');
