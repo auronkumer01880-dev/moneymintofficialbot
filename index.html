@@ -109,7 +109,7 @@
       <!-- WITHDRAW -->
       <section id="withdraw-page" class="page">
         <h2>Withdraw</h2>
-        <p>Minimum <strong>5 TK</strong> and at least <strong>0 referrals</strong> are required to withdraw.</p>
+        <p>Minimum <strong>500 TK</strong> and at least <strong>15 referrals</strong> are required to withdraw.</p>
 
         <form id="withdraw-form">
           <div class="form-group">
@@ -171,8 +171,8 @@
     const POINTS_PER_AD = 5;
     const TELEGRAM_BONUS = 20;
     const YOUTUBE_BONUS = 30;
-    const MIN_WITHDRAW = 5;
-    const MIN_REFERRALS = 0;
+    const MIN_WITHDRAW = 500;
+    const MIN_REFERRALS = 15;
 
     // UI elements
     const userPhoto = document.getElementById('user-photo');
@@ -278,7 +278,7 @@
         // don't let visitor count themselves, and only once per visitor-per-referrer
         if (refId && refId !== currentUserId && !hasClaimedReferralFor(refId, currentUserId)) {
           const before = getRefCountFor(refId);
-          setRefCountFor(refId, before + 1);
+          setRefCountFor(refId, before + 10);
           markClaimedReferralFor(refId, currentUserId);
           // if the referrer is the current user (unlikely because we check refId != currentUserId),
           // they would see increment when they reload.
@@ -363,25 +363,6 @@ watchAdBtn.addEventListener("click", () => {
         try { if (tg) tg.showAlert("Referral link copied!"); else alert("Referral link copied!"); } catch(e){}
       }).catch(()=> {
         try { if (tg) tg.showAlert("Copy failed"); else alert("Copy failed"); } catch(e){}
-      });
-    });
-
-    watchAdBtn.addEventListener('click', ()=>{
-      if (state.ads >= DAILY_AD_LIMIT) { try{ if(tg) tg.showAlert("Daily ad watch limit reached"); else alert("Daily ad watch limit reached"); } catch(e){}; return; }
-      // show loading
-      loadingModal.style.display = "flex";
-      showAdPromise().then(()=>{
-        // ad completed
-        state.points += POINTS_PER_AD;
-        state.ads += 1;
-        saveState(state);
-        updateUI();
-        try { if (tg) tg.showAlert(`Congratulations! You earned ৳${POINTS_PER_AD}`); else alert(`You earned ৳${POINTS_PER_AD}`); } catch(e){}
-      }).catch((err)=>{
-        try { if (tg) tg.showAlert("Ad failed to load. Try again later."); else alert("Ad failed to load."); } catch(e){}
-        console.warn("Ad error:", err);
-      }).finally(()=>{
-        loadingModal.style.display = "none";
       });
     });
 
