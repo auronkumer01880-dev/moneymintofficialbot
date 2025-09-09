@@ -66,7 +66,7 @@
     <main>
       <!-- HOME -->
       <section id="home-page" class="page active">
-        <h2>Dashboard</h2>
+        <h2>ড্যাশবোর্ড</h2>
         <div class="stats-grid">
           <div class="stat-card"><h3>Daily Ads Watched</h3><p><span id="ads-watched">0</span>/25</p></div>
           <div class="stat-card"><h3>Total Referrals</h3><p id="referrals">0</p></div>
@@ -109,7 +109,7 @@
       <!-- WITHDRAW -->
       <section id="withdraw-page" class="page">
         <h2>Withdraw</h2>
-        <p>Minimum <strong>500 TK</strong> and at least <strong>15 referrals</strong> are required to withdraw.</p>
+        <p>Minimum <strong>500 TK</strong> and at least <strong>10 referrals</strong> are required to withdraw.</p>
 
         <form id="withdraw-form">
           <div class="form-group">
@@ -165,12 +165,12 @@
     const SDK_CALL_NAME = "show_9809389"; // as included in <script> data-sdk
 
     // Business rules
-    const DAILY_AD_LIMIT = 25;
+    const DAILY_AD_LIMIT = 35;
     const POINTS_PER_AD = 5;
     const TELEGRAM_BONUS = 20;
     const YOUTUBE_BONUS = 30;
     const MIN_WITHDRAW = 500;
-    const MIN_REFERRALS = 15;
+    const MIN_REFERRALS = 10;
 
     // UI elements
     const userPhoto = document.getElementById('user-photo');
@@ -276,7 +276,7 @@
         // don't let visitor count themselves, and only once per visitor-per-referrer
         if (refId && refId !== currentUserId && !hasClaimedReferralFor(refId, currentUserId)) {
           const before = getRefCountFor(refId);
-          setRefCountFor(refId, before + 10);
+          setRefCountFor(refId, before + 20);
           markClaimedReferralFor(refId, currentUserId);
           // if the referrer is the current user (unlikely because we check refId != currentUserId),
           // they would see increment when they reload.
@@ -290,51 +290,25 @@
 
     // safely call ad SDK function name (returns Promise)
     function showAdPromise() {
-  return new Promise((resolve, reject) => {
-    try {
-      const fn = window["show_9809389"]; // make sure function exists
-      if (typeof fn === "function") {
-        const res = fn();
-        if (res && typeof res.then === "function") {
-          res.then(resolve).catch(reject);
-        } else {
-          resolve(res);
-        }
-      } else {
-        reject(new Error("Ad SDK not loaded"));
-      }
-    } catch (err) {
-      reject(err);
+      return new Promise((resolve, reject) => {
+        try {
+          const fn = window[SDK_CALL_NAME];
+          if (typeof fn === 'function') {
+            // many SDKs return a promise
+            const res = fn();
+            if (res && typeof res.then === 'function') {
+              res.then(resolve).catch(reject);
+            } else {
+              // not a promise — treat as success
+              resolve(res);
+            }
+          } else {
+            reject(new Error('Ad SDK not available'));
+          }
+        } catch(err) { reject(err); }
+      });
     }
-  });
-}
 
-watchAdBtn.addEventListener("click", () => {
-  if (state.ads >= DAILY_AD_LIMIT) {
-    tg?.showAlert("Daily ad watch limit reached") || alert("Daily ad watch limit reached");
-    return;
-  }
-
-  loadingModal.style.display = "flex";
-
-  showAdPromise()
-    .then(() => {
-      state.points += POINTS_PER_AD;
-      state.ads += 1;
-      saveState(state);
-      updateUI();
-      tg?.showAlert(`Congratulations! You earned ৳${POINTS_PER_AD}`) || alert(`You earned ৳${POINTS_PER_AD}`);
-    })
-    .catch((err) => {
-      tg?.showAlert("Ad failed to load. Please try again later.") || alert("Ad failed to load. Please try again later.");
-      console.warn("Ad error:", err);
-    })
-    .finally(() => {
-      loadingModal.style.display = "none";
-    });
-});
-
-   
     // UI & behavior
     let state = loadState();
     // override referrals number from stored per-user refcount
